@@ -1,0 +1,19 @@
+# Node
+app/node_modules/
+node_modules/
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info
+.terraform.lock.hcl
+infra/bootstrap/.terraform/
+
+# Secrets — never commit these
+*.tfvars.local
+.env
+.env.*
+
+# OS
+.DS_Store

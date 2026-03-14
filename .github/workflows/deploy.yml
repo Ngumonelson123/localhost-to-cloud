@@ -9,7 +9,6 @@ env:
   ECR_REPOSITORY: web-api
   ECS_CLUSTER: web-api-cluster
   ECS_SERVICE: web-api-service
-  APP_NAME: web-api
 
 permissions:
   id-token: write
@@ -56,29 +55,41 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.2
-
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4.1.0
         with:
           role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Terraform init
-        working-directory: infra/envs/dev
-        run: terraform init
-
-      # DB password comes from SSM automatically — no secrets needed here
-      - name: Terraform apply new image
-        working-directory: infra/envs/dev
+      # Get current task definition, swap the image, register new revision, update service
+      - name: Deploy new image to ECS
         env:
-          TF_VAR_container_image: ${{ needs.build-and-push.outputs.image }}
-          TF_VAR_app_name: ${{ env.APP_NAME }}
-          TF_VAR_aws_region: ${{ env.AWS_REGION }}
-        run: terraform apply -auto-approve
+          IMAGE: ${{ needs.build-and-push.outputs.image }}
+        run: |
+          TASK_DEF=$(aws ecs describe-task-definition \
+            --task-definition web-api-task \
+            --query 'taskDefinition' \
+            --output json)
+
+          NEW_TASK_DEF=$(echo $TASK_DEF | python3 -c "
+          import json, sys
+          td = json.load(sys.stdin)
+          td['containerDefinitions'][0]['image'] = '$IMAGE'
+          for key in ['taskDefinitionArn','revision','status','requiresAttributes',
+                      'compatibilities','registeredAt','registeredBy']:
+            td.pop(key, None)
+          print(json.dumps(td))
+          ")
+
+          NEW_ARN=$(aws ecs register-task-definition \
+            --cli-input-json "$NEW_TASK_DEF" \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_SERVICE }} \
+            --task-definition $NEW_ARN
 
       - name: Wait for stable deployment
         run: |

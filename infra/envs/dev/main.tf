@@ -14,7 +14,7 @@ terraform {
 
   # Remote state — encrypted, versioned, locked
   backend "s3" {
-    bucket         = "web-api-tfstate-prod"
+    bucket         = "web-api-tfstate-400844546140"
     key            = "web-api/dev/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "web-api-tfstate-lock"

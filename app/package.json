@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "node -e \"require('./index.js')\" & sleep 2 && curl -sf http://localhost:3000/healthz && kill %1"
+    "test": "node index.js & sleep 2 && curl -sf http://localhost:3000/healthz && kill $! || true"
   },
   "dependencies": {
     "express": "^4.18.2",

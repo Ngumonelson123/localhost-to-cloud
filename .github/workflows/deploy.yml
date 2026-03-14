@@ -96,4 +96,4 @@ jobs:
           aws ecs wait services-stable \
             --cluster ${{ env.ECS_CLUSTER }} \
             --services ${{ env.ECS_SERVICE }}
-          echo "✅ Deployed — ${{ needs.build-and-push.outputs.image }}"
+          echo "Deployed — ${{ needs.build-and-push.outputs.image }}"

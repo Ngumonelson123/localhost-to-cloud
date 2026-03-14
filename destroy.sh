@@ -5,7 +5,6 @@ PROJECT_ROOT="$(cd "$(dirname "$0")" && pwd)"
 DEV_DIR="$PROJECT_ROOT/infra/envs/dev"
 APP_NAME="web-api"
 AWS_REGION="us-east-1"
-DB_PASSWORD="${DB_PASSWORD:-dummy}"  # needed for var validation only
 
 echo "==> Emptying S3 frontend bucket before destroy..."
 cd "$DEV_DIR"
@@ -18,12 +17,11 @@ fi
 echo ""
 echo "==> Destroying all infrastructure..."
 terraform destroy -auto-approve \
-  -var="db_password=$DB_PASSWORD" \
   -var="app_name=$APP_NAME" \
   -var="aws_region=$AWS_REGION"
 
 echo ""
-echo "✅ All infrastructure destroyed. No ongoing charges."
+echo "All infrastructure destroyed. No ongoing charges."
 echo ""
 echo "NOTE: The S3 state bucket and DynamoDB lock table are preserved"
 echo "      (prevent_destroy = true). To remove them manually:"

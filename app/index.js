@@ -29,7 +29,7 @@ app.get('/db-check', async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => res.json({ message: 'Hello from the cloud!', env: process.env.ENV || 'local' }));
+app.get('/', (req, res) => res.json({ message: 'Hello AWS UG AI/ML USER GROUP!', env: process.env.ENV || 'local' }));
 
 // Serve frontend for any non-API route
 app.get('/ui', (req, res) => {

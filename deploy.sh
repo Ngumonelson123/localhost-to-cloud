@@ -9,7 +9,7 @@ DEV_DIR="$PROJECT_ROOT/infra/envs/dev"
 APP_NAME="web-api"
 AWS_REGION="us-east-1"
 
-# ── PREFLIGHT ─────────────────────────────────────────────────
+#PREFLIGHT
 echo "==> Checking required tools..."
 for tool in aws terraform docker git; do
   command -v "$tool" &>/dev/null || { echo "ERROR: $tool not found"; exit 1; }
@@ -18,7 +18,7 @@ done
 aws sts get-caller-identity --query 'Account' --output text &>/dev/null \
   || { echo "ERROR: AWS credentials not configured. Run: aws configure"; exit 1; }
 
-# ── STEP 1: BOOTSTRAP STATE BACKEND ──────────────────────────
+#STEP 1: BOOTSTRAP STATE BACKEND
 echo ""
 echo "==> [1/4] Bootstrapping Terraform state backend (S3 + DynamoDB)..."
 cd "$BOOTSTRAP_DIR"
@@ -32,7 +32,7 @@ DYNAMO_TABLE=$(terraform output -raw dynamodb_table_name)
 echo "    State bucket : $S3_BUCKET"
 echo "    Lock table   : $DYNAMO_TABLE"
 
-# ── STEP 2: AUTO-PATCH BACKEND BLOCK ─────────────────────────
+#STEP 2: AUTO-PATCH BACKEND BLOCK
 echo ""
 echo "==> [2/4] Patching backend config in infra/envs/dev/main.tf..."
 MAIN_TF="$DEV_DIR/main.tf"
@@ -40,7 +40,7 @@ sed -i "s|bucket         = \".*\"|bucket         = \"$S3_BUCKET\"|" "$MAIN_TF"
 sed -i "s|dynamodb_table = \".*\"|dynamodb_table = \"$DYNAMO_TABLE\"|" "$MAIN_TF"
 echo "    Backend patched."
 
-# ── STEP 3: APPLY FULL INFRASTRUCTURE ────────────────────────
+#STEP 3: APPLY FULL INFRASTRUCTURE
 # DB password is read automatically from SSM — no manual input needed
 echo ""
 echo "==> [3/4] Applying full infrastructure (VPC, ECS, RDS, ALB)..."
@@ -61,7 +61,7 @@ ECR_URI=$(terraform output -raw ecr_repository_url)
 ALB_DNS=$(terraform output -raw alb_dns)
 S3_FRONTEND=$(terraform output -raw s3_bucket_name)
 
-# ── STEP 4: FIRST IMAGE PUSH FROM LAPTOP ─────────────────────
+#STEP 4: FIRST IMAGE PUSH FROM LAPTOP
 echo ""
 echo "==> [4/4] Building and pushing initial Docker image to ECR..."
 GIT_SHA=$(git -C "$PROJECT_ROOT" rev-parse HEAD)

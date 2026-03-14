@@ -26,7 +26,6 @@ jobs:
   build-and-push:
     needs: test
     runs-on: ubuntu-latest
-    if: ${{ secrets.AWS_DEPLOY_ROLE_ARN != '' }}
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -55,7 +54,6 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    if: ${{ secrets.AWS_DEPLOY_ROLE_ARN != '' }}
     steps:
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4.1.0

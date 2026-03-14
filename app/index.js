@@ -1,9 +1,11 @@
 // index.js
 const express = require('express');
 const { Pool } = require('pg');
+const path = require('path');
 
 const app = express();
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 const pool = new Pool({
   host:     process.env.DB_HOST,
@@ -28,5 +30,10 @@ app.get('/db-check', async (req, res) => {
 });
 
 app.get('/', (req, res) => res.json({ message: 'Hello from the cloud!', env: process.env.ENV || 'local' }));
+
+// Serve frontend for any non-API route
+app.get('/ui', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 app.listen(3000, '0.0.0.0', () => console.log('Server listening on port 3000'));

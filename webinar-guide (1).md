@@ -398,13 +398,13 @@ resource "aws_vpc" "main" {
   tags = { Name = "${var.app_name}-vpc" }
 }
 
-# ─── INTERNET GATEWAY ─────────────────────────────────────────
+# ─── INTERNET GATEWAY
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
   tags   = { Name = "${var.app_name}-igw" }
 }
 
-# ─── PUBLIC SUBNETS (ALB lives here) ──────────────────────────
+# ─── PUBLIC SUBNETS (ALB lives here)
 resource "aws_subnet" "public" {
   count                   = 2
   vpc_id                  = aws_vpc.main.id
@@ -414,7 +414,7 @@ resource "aws_subnet" "public" {
   tags = { Name = "${var.app_name}-public-${count.index + 1}" }
 }
 
-# ─── PRIVATE SUBNETS (ECS + RDS live here) ────────────────────
+# ─── PRIVATE SUBNETS (ECS + RDS live here)
 resource "aws_subnet" "private" {
   count             = 2
   vpc_id            = aws_vpc.main.id
@@ -423,7 +423,7 @@ resource "aws_subnet" "private" {
   tags = { Name = "${var.app_name}-private-${count.index + 1}" }
 }
 
-# ─── NAT GATEWAY (private → internet, not the reverse) ────────
+# ─── NAT GATEWAY (private → internet, not the reverse)
 resource "aws_eip" "nat" {
   domain = "vpc"
   tags   = { Name = "${var.app_name}-nat-eip" }
@@ -436,7 +436,7 @@ resource "aws_nat_gateway" "main" {
   depends_on    = [aws_internet_gateway.main]
 }
 
-# ─── ROUTE TABLES ─────────────────────────────────────────────
+#ROUTE TABLES
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
   route {
@@ -569,7 +569,7 @@ echo "Pushed: ${ECR_URI}:${GIT_SHA}"
 
 <a name="step-6"></a>
 ## STEP 6: Security Groups & IAM
-⏱️ *~8 minutes* | 📊 Slide: *(part of Step 6 — ECS/ALB)*
+⏱️ *~8 minutes* |Slide: *(part of Step 6 — ECS/ALB)*
 
 ### 🎤 WHAT TO SAY
 

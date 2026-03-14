@@ -56,6 +56,7 @@ terraform init -input=false \
 
 terraform apply -input=false -auto-approve \
   -var="db_password=$DB_PASSWORD" \
+  -var="container_image=$ECR_URI:$IMAGE_TAG" \
   -var="app_name=$APP_NAME" \
   -var="aws_region=$AWS_REGION"
 

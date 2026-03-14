@@ -43,7 +43,7 @@ resource "aws_launch_template" "ecs" {
   tags = { Name = "${var.app_name}-ecs-instance" }
 }
 
-# ─── AUTO SCALING GROUP ───────────────────────────────────────
+#AUTO SCALING GROUP
 resource "aws_autoscaling_group" "ecs" {
   name                  = "${var.app_name}-ecs-asg"
   desired_capacity      = 2
@@ -69,7 +69,7 @@ resource "aws_autoscaling_group" "ecs" {
   }
 }
 
-# ─── CAPACITY PROVIDER ────────────────────────────────────────
+#CAPACITY PROVIDER
 resource "aws_ecs_capacity_provider" "main" {
   name = "${var.app_name}-cp"
   auto_scaling_group_provider {
@@ -94,13 +94,13 @@ resource "aws_ecs_cluster_capacity_providers" "main" {
   }
 }
 
-# ─── CLOUDWATCH LOG GROUP ─────────────────────────────────────
+# CLOUDWATCH LOG GROUP
 resource "aws_cloudwatch_log_group" "app" {
   name              = "/ecs/${var.app_name}"
   retention_in_days = 30
 }
 
-# ─── ALB ──────────────────────────────────────────────────────
+# ALB
 resource "aws_lb" "main" {
   name               = "${var.app_name}-alb"
   internal           = false
@@ -140,7 +140,7 @@ resource "aws_lb_listener" "http" {
   }
 }
 
-# ─── ECS TASK DEFINITION ──────────────────────────────────────
+# ECS TASK DEFINITION 
 resource "aws_ecs_task_definition" "app" {
   family                   = "${var.app_name}-task"
   network_mode             = "bridge"
@@ -193,7 +193,7 @@ resource "aws_ecs_task_definition" "app" {
   tags = { Name = "${var.app_name}-task" }
 }
 
-# ─── ECS SERVICE ──────────────────────────────────────────────
+# ECS SERVICE 
 resource "aws_ecs_service" "app" {
   name            = "${var.app_name}-service"
   cluster         = aws_ecs_cluster.main.id

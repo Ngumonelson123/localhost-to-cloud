@@ -11,40 +11,37 @@ env:
   ECS_SERVICE: web-api-service
 
 permissions:
-  id-token: write  # Required for OIDC — lets GitHub request a token from AWS
+  id-token: write
   contents: read
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: '18' }
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/setup-node@v4.4.0
+        with: { node-version: '20' }
       - run: cd app && npm install && npm test
 
   build-and-push:
     needs: test
     runs-on: ubuntu-latest
+    if: ${{ secrets.AWS_DEPLOY_ROLE_ARN != '' }}
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
 
-      # OIDC: GitHub exchanges its token for short-lived AWS credentials.
-      # No AWS_ACCESS_KEY_ID or AWS_SECRET_ACCESS_KEY stored anywhere.
-      # The role ARN comes from: terraform output github_actions_role_arn
       - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v4.1.0
         with:
           role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+        uses: aws-actions/amazon-ecr-login@v2.0.1
 
-      # Tag with full commit SHA — never use 'latest' in production
       - name: Build, tag, and push image to ECR
         id: build
         env:
@@ -58,14 +55,14 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    if: ${{ secrets.AWS_DEPLOY_ROLE_ARN != '' }}
     steps:
       - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v4.1.0
         with:
           role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # Force ECS to pull the new image and do a rolling deploy
       - name: Deploy new image to ECS
         run: |
           aws ecs update-service \
@@ -78,4 +75,4 @@ jobs:
           aws ecs wait services-stable \
             --cluster ${{ env.ECS_CLUSTER }} \
             --services ${{ env.ECS_SERVICE }}
-          echo "✅ Deployment complete — image: ${{ needs.build-and-push.outputs.image }}"
+          echo "✅ Deployment complete — ${{ needs.build-and-push.outputs.image }}"

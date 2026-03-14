@@ -31,8 +31,8 @@ resource "aws_iam_role" "github_actions" {
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
         }
         StringLike = {
-          # Replace YOUR_GITHUB_USERNAME/YOUR_REPO with your actual repo
-          "token.actions.githubusercontent.com:sub" = "repo:ngumonelson123/localhost-to-cloud:*"
+          # Replace Ngumonelson123/YOUR_REPO with your actual repo
+          "token.actions.githubusercontent.com:sub" = "repo:Ngumonelson123/localhost-to-cloud:*"
         }
       }
     }]

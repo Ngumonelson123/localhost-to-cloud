@@ -31,7 +31,7 @@ resource "aws_iam_role" "github_actions" {
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
         }
         StringLike = {
-          # Replace Ngumonelson123/YOUR_REPO with your actual repo
+          
           "token.actions.githubusercontent.com:sub" = "repo:Ngumonelson123/localhost-to-cloud:*"
         }
       }
@@ -39,7 +39,7 @@ resource "aws_iam_role" "github_actions" {
   })
 }
 
-# ─── PERMISSIONS: push to ECR + redeploy ECS only ────────────
+#PERMISSIONS: push to ECR + redeploy ECS only
 resource "aws_iam_role_policy" "github_actions" {
   name = "ecr-ecs-deploy"
   role = aws_iam_role.github_actions.id
@@ -74,7 +74,9 @@ resource "aws_iam_role_policy" "github_actions" {
           "ecs:UpdateService",
           "ecs:DescribeServices",
           "ecs:RegisterTaskDefinition",
-          "ecs:DescribeTaskDefinition"
+          "ecs:DescribeTaskDefinition",
+          "ecs:ListTaskDefinitions",
+          "ecs:DeregisterTaskDefinition"
         ]
         Resource = "*"
       },
@@ -83,6 +85,55 @@ resource "aws_iam_role_policy" "github_actions" {
         Effect   = "Allow"
         Action   = ["iam:PassRole"]
         Resource = aws_iam_role.ecs_execution.arn
+      },
+      {
+        Sid    = "TerraformState"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::web-api-tfstate-400844546140",
+          "arn:aws:s3:::web-api-tfstate-400844546140/*"
+        ]
+      },
+      {
+        Sid    = "TerraformLock"
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:DeleteItem"
+        ]
+        Resource = "arn:aws:dynamodb:us-east-1:400844546140:table/web-api-tfstate-lock"
+      },
+      {
+        Sid    = "ReadInfra"
+        Effect = "Allow"
+        Action = [
+          "elasticloadbalancing:Describe*",
+          "cloudwatch:Describe*",
+          "cloudwatch:List*",
+          "logs:Describe*",
+          "secretsmanager:Describe*",
+          "secretsmanager:GetSecretValue",
+          "rds:Describe*",
+          "ec2:Describe*",
+          "iam:GetRole",
+          "iam:GetRolePolicy",
+          "iam:ListRolePolicies",
+          "iam:ListAttachedRolePolicies",
+          "iam:GetInstanceProfile",
+          "iam:GetOpenIDConnectProvider",
+          "sns:GetTopicAttributes",
+          "sns:ListSubscriptionsByTopic",
+          "autoscaling:Describe*",
+          "ssm:GetParameter"
+        ]
+        Resource = "*"
       }
     ]
   })

@@ -10,7 +10,7 @@ resource "aws_sns_topic_subscription" "email" {
   endpoint  = "nelsonmbui88@gmail.com"
 }
 
-# ─── ALARM: 5xx Error Rate ─────────────────────────────────────
+# ALARM: 5xx Error Rate 
 resource "aws_cloudwatch_metric_alarm" "alb_5xx" {
   alarm_name          = "${var.app_name}-alb-5xx"
   comparison_operator = "GreaterThanThreshold"
@@ -28,7 +28,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_5xx" {
   }
 }
 
-# ─── ALARM: Unhealthy Hosts ────────────────────────────────────
+#ALARM: Unhealthy Hosts 
 resource "aws_cloudwatch_metric_alarm" "unhealthy_hosts" {
   alarm_name          = "${var.app_name}-unhealthy-hosts"
   comparison_operator = "GreaterThanThreshold"
@@ -47,7 +47,7 @@ resource "aws_cloudwatch_metric_alarm" "unhealthy_hosts" {
   }
 }
 
-# ─── ALARM: ECS CPU High ───────────────────────────────────────
+# ALARM: ECS CPU High
 resource "aws_cloudwatch_metric_alarm" "ecs_cpu" {
   alarm_name          = "${var.app_name}-ecs-cpu"
   comparison_operator = "GreaterThanThreshold"

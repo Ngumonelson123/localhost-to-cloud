@@ -1,4 +1,4 @@
-# ─── ECS CLUSTER ──────────────────────────────────────────────
+# ECS CLUSTER
 resource "aws_ecs_cluster" "main" {
   name = "${var.app_name}-cluster"
   setting {
@@ -8,12 +8,12 @@ resource "aws_ecs_cluster" "main" {
   tags = { Name = "${var.app_name}-cluster" }
 }
 
-# ─── LATEST ECS-OPTIMISED AMI ─────────────────────────────────
+# LATEST ECS-OPTIMISED AMI
 data "aws_ssm_parameter" "ecs_ami" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"
 }
 
-# ─── LAUNCH TEMPLATE ──────────────────────────────────────────
+#LAUNCH TEMPLATE
 resource "aws_launch_template" "ecs" {
   name_prefix            = "${var.app_name}-ecs-lt-"
   image_id               = data.aws_ssm_parameter.ecs_ami.value

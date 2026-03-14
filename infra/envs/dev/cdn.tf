@@ -1,6 +1,6 @@
 resource "random_id" "suffix" { byte_length = 4 }
 
-# ─── S3 BUCKET (frontend static files) ───────────────────────
+# BUCKET (frontend static files)
 resource "aws_s3_bucket" "frontend" {
   bucket = "${var.app_name}-frontend-${random_id.suffix.hex}"
   tags   = { Name = "${var.app_name}-frontend" }
@@ -22,7 +22,4 @@ resource "aws_s3_bucket_versioning" "frontend" {
 # NOTE: CloudFront is disabled — account requires AWS Support verification
 # before CloudFront resources can be created. For this demo the ALB serves
 # as the entry point. CloudFront can be re-enabled once account is verified:
-#
-# resource "aws_cloudfront_origin_access_control" "main" { ... }
-# resource "aws_cloudfront_distribution" "main" { ... }
-# resource "aws_s3_bucket_policy" "frontend" { ... }
+

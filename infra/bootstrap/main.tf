@@ -6,8 +6,7 @@ terraform {
       version = "~> 5.0"
     }
   }
-  # Intentionally NO backend block — local state is correct here.
-  # This is the chicken-and-egg bootstrap: S3 can't store state before it exists.
+  # Intentionally NO backend block local state is correct here.S3 can't store state before it exists.
 }
 
 provider "aws" {
@@ -16,7 +15,7 @@ provider "aws" {
 
 data "aws_caller_identity" "current" {}
 
-# ─── S3 STATE BUCKET
+#S3 STATE BUCKET
 resource "aws_s3_bucket" "tfstate" {
   bucket = "${var.app_name}-tfstate-${data.aws_caller_identity.current.account_id}"
 
@@ -62,7 +61,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "tfstate" {
   }
 }
 
-# ─── DYNAMODB LOCK TABLE ──────────────────────────────────────
+# DYNAMODB LOCK TABLE 
 resource "aws_dynamodb_table" "tfstate_lock" {
   name         = "${var.app_name}-tfstate-lock"
   billing_mode = "PAY_PER_REQUEST"

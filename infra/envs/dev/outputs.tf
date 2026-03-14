@@ -2,8 +2,8 @@ output "alb_dns" {
   value = aws_lb.main.dns_name
 }
 
-output "cloudfront_url" {
-  value = "https://${aws_cloudfront_distribution.main.domain_name}"
+output "alb_url" {
+  value = "http://${aws_lb.main.dns_name}"
 }
 
 output "s3_bucket_name" {
@@ -22,3 +22,4 @@ output "rds_endpoint" {
 output "ecs_cluster_name" {
   value = aws_ecs_cluster.main.name
 }
+

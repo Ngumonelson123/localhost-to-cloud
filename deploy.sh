@@ -34,7 +34,7 @@ DYNAMO_TABLE=$(terraform output -raw dynamodb_table_name)
 echo "    State bucket : $S3_BUCKET"
 echo "    Lock table   : $DYNAMO_TABLE"
 
-# ── STEP 2: AUTO-PATCH BACKEND BLOCK
+#STEP 2: AUTO-PATCH BACKEND BLOCK
 echo ""
 echo "==> [2/4] Patching backend config in infra/envs/dev/main.tf..."
 MAIN_TF="$DEV_DIR/main.tf"
@@ -42,7 +42,7 @@ sed -i "s|bucket         = \".*\"|bucket         = \"$S3_BUCKET\"|" "$MAIN_TF"
 sed -i "s|dynamodb_table = \".*\"|dynamodb_table = \"$DYNAMO_TABLE\"|" "$MAIN_TF"
 echo "    Backend patched."
 
-# ── STEP 3: APPLY FULL INFRASTRUCTURE
+#STEP 3: APPLY FULL INFRASTRUCTURE
 echo ""
 echo "==> [3/4] Applying full infrastructure (VPC, ECS, RDS, ALB, CloudFront)..."
 cd "$DEV_DIR"
@@ -61,7 +61,7 @@ terraform apply -input=false -auto-approve \
 
 ECR_URI=$(terraform output -raw ecr_repository_url)
 ALB_DNS=$(terraform output -raw alb_dns)
-CF_URL=$(terraform output -raw cloudfront_url)
+CF_URL=$(terraform output -raw alb_url)
 S3_FRONTEND=$(terraform output -raw s3_bucket_name)
 
 # ── STEP 4: FIRST IMAGE PUSH FROM LAPTOP
